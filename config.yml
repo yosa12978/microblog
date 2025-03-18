@@ -1,0 +1,13 @@
+app:
+  name: Yusuf's blog
+  description: Just a simple blog
+  bottom: Yusuf's microblog. All content is unlicensed.
+server:
+  addr: 0.0.0.0:80
+  hostname: localhost:5000
+postgres:
+  addr: microblog-postgres:5432
+  db: microblog_db
+  user: user
+  password: user
+  ssl_mode: disable

@@ -1,0 +1,35 @@
+services:
+  microblog:
+    container_name: microblog-web
+    build:
+      context: .
+      dockerfile: air.dockerfile
+    restart: unless-stopped
+    ports:
+      - 5000:80/tcp
+    volumes:
+      - ".:/app"
+  postgres:
+    container_name: microblog-postgres
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user
+      - POSTGRES_DB=microblog_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  adminer:
+    container_name: microblog-adminer
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "5001:8080"
+
+volumes:
+  pg_data:

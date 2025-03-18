@@ -1,0 +1,29 @@
+{{template "top" .}}
+
+<div class="description">
+  {{.Content.Description}}
+</div>
+
+{{ if .Content.Posts }}
+{{range .Content.Posts.Content}}
+<div class="post">
+  <div class="content" id="content-{{.ID}}"></div>
+  <div class="meta"><span>Posted <span id="date-{{.ID}}"></span></span><span><a href="/posts/{{.ID}}">{{.ID}}</a></span></div>
+  <script>
+    document.getElementById("date-{{.ID}}").innerHTML = toDateString_("{{.CreatedAt}}");
+    document.getElementById("content-{{.ID}}").innerHTML = renderMarkdown("{{.Content}}");
+  </script>
+</div>
+{{end}}
+{{end}}
+
+<div class="pages">
+  {{if .Content.Posts.HasPrev}}
+  <a href="/?page={{.Content.Posts.PrevPage}}&size={{.Content.Posts.Size}}" class="btn" id="prev">&lt; Prev</a>
+  {{end}}
+  {{if .Content.Posts.HasNext}}
+  <a href="/?page={{.Content.Posts.NextPage}}&size={{.Content.Posts.Size}}" class="btn" id="next">Next &gt;</a>
+  {{end}}
+</div>
+
+{{template "bottom" .}}

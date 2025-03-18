@@ -1,0 +1,17 @@
+root = "."
+tmp_dir = "bin"
+
+[build]
+cmd = "make"
+bin = "./bin/microblog"
+full_bin = "./bin/microblog"
+include_ext = ["go", "tpl", "tmpl", "css", "html", "yaml", "yml", "sh", "makefile"]
+exclude_dir = ["tmp", "vendor", "bin", "docs"]
+include_dir = []
+exclude_file = ["docker-compose.yaml", "docker-compose.yml", "compose.yml"]
+delay = 1000
+stop_on_error = true
+log = "air_errors.log"
+
+[misc]
+clean_on_exit = true

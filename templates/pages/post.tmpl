@@ -1,0 +1,14 @@
+{{template "top" .}}
+
+{{ if .Content.Post }}
+<div class="post">
+  <div class="content" id="content"></div>
+  <div class="meta"><span>Posted <span id="date"></span></span><span>{{.Content.Post.ID}}</span></div>
+  <script>
+    document.getElementById("date").innerHTML = toDateString_("{{.Content.Post.CreatedAt}}");
+    document.getElementById("content").innerHTML = renderMarkdown("{{.Content.Post.Content}}");
+  </script>
+</div>
+{{end}}
+
+{{template "bottom" .}}
