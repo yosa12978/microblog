@@ -9,6 +9,9 @@ services:
       - 5000:80/tcp
     volumes:
       - ".:/app"
+    depends_on:
+      postgres:
+        condition: service_healthy
   postgres:
     container_name: microblog-postgres
     image: postgres:latest
