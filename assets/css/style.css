@@ -108,3 +108,12 @@ footer {
 .description {
     margin: 15px 10px 30px 10px;
 }
+
+#login-form {
+    margin: 10px;
+}
+
+#error-message {
+    margin: 10px;
+    color: #eb4129;
+}

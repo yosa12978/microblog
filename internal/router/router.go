@@ -9,7 +9,9 @@ import (
 	"microblog-app/internal/dto"
 	"microblog-app/internal/middleware"
 	"microblog-app/internal/services"
+	"microblog-app/internal/session"
 	"microblog-app/internal/templates"
+	"microblog-app/pkg"
 	"net/http"
 	"strconv"
 
@@ -127,4 +129,51 @@ func addRoutes(router *http.ServeMux, opts *RouterOptions) {
 		}
 		templates.Render(w, "post", dto.PostTemplateDTO{Post: *post})
 	})
+
+	router.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := session.Get(r, w); err == nil {
+			http.Redirect(w, r, "/admin", http.StatusFound)
+			return
+		}
+
+		templates.Render(w, "login", nil)
+	})
+
+	router.HandleFunc("GET /logout", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := session.Get(r, w); err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		if err := session.End(r, w); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		http.Redirect(w, r, "/", http.StatusFound)
+	})
+
+	router.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := session.Get(r, w); err == nil {
+			http.Redirect(w, r, "/admin", http.StatusFound)
+			return
+		}
+
+		r.ParseForm()
+		password := r.FormValue("password")
+		if !pkg.CheckPasswordHash(password, opts.Config.App.AdminPassword) {
+			templates.Render(w, "login", dto.LoginTemplateDTO{Message: "wrong credentials"})
+			return
+		}
+		if err := session.Start(r, w); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		http.Redirect(w, r, "/admin", http.StatusFound)
+	})
+
+	router.Handle(
+		"GET /admin",
+		middleware.Admin()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("admin page"))
+		})),
+	)
 }

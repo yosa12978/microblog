@@ -1,0 +1,15 @@
+{{template "top" .}}
+
+{{if .Content}}
+<div id="error-message">
+    {{.Content.Message}}
+</div>
+{{end}}
+
+<form action="/login" method="POST" id="login-form">
+  <label for="password">Admin password</label>
+  <input type="password" name="password" />
+  <button type="submit" class="btn">Login</button>
+</form>
+
+{{template "bottom" .}}

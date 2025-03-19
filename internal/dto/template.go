@@ -12,3 +12,7 @@ type BlogTemplateDTO struct {
 type PostTemplateDTO struct {
 	Post PostResponse
 }
+
+type LoginTemplateDTO struct {
+	Message string
+}

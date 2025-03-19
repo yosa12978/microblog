@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"microblog-app/internal/config"
 	"microblog-app/internal/data"
+	"microblog-app/internal/session"
 	"microblog-app/internal/templates"
 	"net/http"
 	"os"
@@ -45,6 +46,7 @@ func (app *App) Run() error {
 	if _, err := data.InitPostgres(ctx, app.migrations); err != nil {
 		return err
 	}
+	session.InitStore()
 
 	server := newServer(app.conf.Server.Addr, app.logger, app.assets, app.conf)
 	errCh := make(chan error, 1)

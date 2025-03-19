@@ -10,9 +10,10 @@ import (
 
 type Config struct {
 	App struct {
-		Name   string `yaml:"name"`
-		Desc   string `yaml:"description"`
-		Bottom string `yaml:"bottom"`
+		Name          string `yaml:"name"`
+		Desc          string `yaml:"description"`
+		Bottom        string `yaml:"bottom"`
+		AdminPassword string `yaml:"admin_password"`
 	} `yaml:"app"`
 	Server struct {
 		Addr     string `yaml:"addr"`
