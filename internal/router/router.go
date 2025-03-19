@@ -66,7 +66,11 @@ func addRoutes(router *http.ServeMux, opts *RouterOptions) {
 		if r.TLS != nil {
 			scheme = "https"
 		}
-		baseLink := fmt.Sprintf("%s://%s", scheme, opts.Config.Server.Hostname)
+		hostname := opts.Config.Server.Hostname
+		if hostname == "" {
+			hostname = r.URL.Host
+		}
+		baseLink := fmt.Sprintf("%s://%s", scheme, hostname)
 		feed := &feeds.Feed{
 			Title:       opts.Config.App.Name,
 			Link:        &feeds.Link{Href: baseLink},
@@ -87,11 +91,13 @@ func addRoutes(router *http.ServeMux, opts *RouterOptions) {
 			}
 			content := buf.String()
 			item := &feeds.Item{
+				Id:    fmt.Sprintf("%v", v.ID),
 				Title: title,
 				Link: &feeds.Link{
 					Href: fmt.Sprintf("%s/posts/%v", baseLink, v.ID),
 				},
 				Created: v.CreatedAt,
+				Updated: v.UpdatedAt,
 				Content: content,
 			}
 			feed.Items = append(feed.Items, item)
