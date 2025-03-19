@@ -9,6 +9,7 @@ import (
 
 type ID uint64
 type Content string
+type Pinned bool
 type CreatedAt time.Time
 type UpdatedAt time.Time
 
@@ -18,6 +19,14 @@ func NewID(id uint64) (ID, error) {
 
 func (id ID) Value() uint64 {
 	return uint64(id)
+}
+
+func NewPinned(pinned bool) (Pinned, error) {
+	return Pinned(pinned), nil
+}
+
+func (pinned Pinned) Value() bool {
+	return bool(pinned)
 }
 
 func NewContent(content string) (Content, error) {

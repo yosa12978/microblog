@@ -75,8 +75,8 @@ func addRoutes(router *http.ServeMux, opts *RouterOptions) {
 
 		feed.Items = []*feeds.Item{}
 
-		posts, err := opts.PostService.GetAll(r.Context(), 1, 30)
-		for _, v := range posts.Content {
+		posts, err := opts.PostService.GetFeed(r.Context())
+		for _, v := range posts {
 			title := v.Content
 			if len(v.Content) > 20 {
 				title = v.Content[:20] + "..."

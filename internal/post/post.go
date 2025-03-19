@@ -8,14 +8,16 @@ import (
 type Post struct {
 	id        ID
 	content   Content
+	pinned    Pinned
 	createdAt CreatedAt
 	updatedAt UpdatedAt
 }
 
-func New(id ID, content Content, createdAt CreatedAt, updatedAt UpdatedAt) Post {
+func New(id ID, content Content, pinned Pinned, createdAt CreatedAt, updatedAt UpdatedAt) Post {
 	return Post{
 		id:        id,
 		content:   content,
+		pinned:    pinned,
 		createdAt: createdAt,
 		updatedAt: updatedAt,
 	}
@@ -31,13 +33,17 @@ func NewFromPrimitives(id uint64, content string) (Post, error) {
 	if err != nil {
 		problems["content"] = err.Error()
 	}
+	newPinned, err := NewPinned(false)
+	if err != nil {
+		problems["pinned"] = err.Error()
+	}
 	now := time.Now().UTC()
 	newCreatedAt, _ := NewCreatedAt(now)
 	newUpdatedAt, _ := NewUpdatedAt(now)
 	if len(problems) != 0 {
 		return Post{}, problems
 	}
-	return New(newID, newContent, newCreatedAt, newUpdatedAt), nil
+	return New(newID, newContent, newPinned, newCreatedAt, newUpdatedAt), nil
 }
 
 func (p *Post) ID() ID {
@@ -46,6 +52,10 @@ func (p *Post) ID() ID {
 
 func (p *Post) Content() Content {
 	return p.content
+}
+
+func (p *Post) Pinned() Pinned {
+	return p.pinned
 }
 
 func (p *Post) CreatedAt() CreatedAt {
@@ -63,6 +73,11 @@ func (p *Post) SetID(id ID) error {
 
 func (p *Post) SetContent(content Content) error {
 	p.content = content
+	return nil
+}
+
+func (p *Post) SetPinned(pinned Pinned) error {
+	p.pinned = pinned
 	return nil
 }
 

@@ -10,6 +10,7 @@ import (
 
 type PostService interface {
 	GetAll(ctx context.Context, page, size uint) (*pkg.Page[dto.PostResponse], error)
+	GetFeed(ctx context.Context) ([]dto.PostResponse, error)
 	GetByID(ctx context.Context, id uint64) (*dto.PostResponse, error)
 
 	Create(ctx context.Context, req dto.PostCreateRequest) (uint64, error)
@@ -61,6 +62,18 @@ func (p *postService) GetAll(
 		result.Content = append(result.Content, dto.NewPostResponse(v))
 	}
 	return &result, nil
+}
+
+func (p *postService) GetFeed(ctx context.Context) ([]dto.PostResponse, error) {
+	posts, err := p.repo.GetFeed(ctx)
+	if err != nil {
+		return []dto.PostResponse{}, err
+	}
+	res := []dto.PostResponse{}
+	for _, v := range posts {
+		res = append(res, dto.NewPostResponse(v))
+	}
+	return res, nil
 }
 
 func (p *postService) GetByID(ctx context.Context, id uint64) (*dto.PostResponse, error) {

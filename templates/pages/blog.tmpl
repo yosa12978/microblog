@@ -8,7 +8,7 @@
 {{range .Content.Posts.Content}}
 <div class="post">
   <div class="content" id="content-{{.ID}}"></div>
-  <div class="meta"><span>Posted <span id="date-{{.ID}}"></span></span><span><a href="/posts/{{.ID}}">{{.ID}}</a></span></div>
+  <div class="meta"><span>{{if .Pinned}}<span>(Pinned) </span>{{end}}Posted <span id="date-{{.ID}}"></span></span><span><a href="/posts/{{.ID}}">{{.ID}}</a></span></div>
   <script>
     document.getElementById("date-{{.ID}}").innerHTML = toDateString_("{{.CreatedAt}}");
     document.getElementById("content-{{.ID}}").innerHTML = renderMarkdown("{{.Content}}");

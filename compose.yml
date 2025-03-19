@@ -16,6 +16,8 @@ services:
     container_name: microblog-postgres
     image: postgres:latest
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:

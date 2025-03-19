@@ -8,6 +8,7 @@ import (
 type PostSQL struct {
 	ID        uint64
 	Content   string
+	Pinned    bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -16,6 +17,7 @@ func ToSQL(post Post) PostSQL {
 	return PostSQL{
 		ID:        post.id.Value(),
 		Content:   post.content.Value(),
+		Pinned:    post.pinned.Value(),
 		CreatedAt: post.createdAt.Value(),
 		UpdatedAt: post.updatedAt.Value(),
 	}
@@ -31,6 +33,10 @@ func (p PostSQL) Domain() (Post, error) {
 	if err != nil {
 		problems["content"] = err.Error()
 	}
+	newPinned, err := NewPinned(p.Pinned)
+	if err != nil {
+		problems["pinned"] = err.Error()
+	}
 	newCreatedAt, err := NewCreatedAt(p.CreatedAt)
 	if err != nil {
 		problems["createdAt"] = err.Error()
@@ -42,10 +48,5 @@ func (p PostSQL) Domain() (Post, error) {
 	if len(problems) != 0 {
 		return Post{}, problems
 	}
-	return Post{
-		id:        newID,
-		content:   newContent,
-		createdAt: newCreatedAt,
-		updatedAt: newUpdatedAt,
-	}, nil
+	return New(newID, newContent, newPinned, newCreatedAt, newUpdatedAt), nil
 }
