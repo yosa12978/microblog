@@ -1,20 +1,19 @@
-function toDateString_(dateISO8601, timezone = "GMT") {
-  const d = new Date(dateISO8601);
-  let diffInTime = new Date().getTime() - d.getTime();
-  let diffInDays = Math.round(diffInTime / (1000 * 3600 * 24));
-  if (diffInDays > 7) {
-    return (
-      "on " +
-      d.toLocaleDateString("en-US", {
-        timeZone: "UTC",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour12: true,
-      })
-    );
-  }
-  return moment(dateISO8601).utc().fromNow();
+function toDateString_(date) {
+  const dt = new Date(date);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    hour12: false,
+  };
+
+  const dateString = dt.toLocaleString("default", options);
+  const parts = dateString.split(" ");
+  const timeParts = parts[parts.length - 1].split(":");
+  return `${parts[0]} ${parts[1]} ${parts[2]} ${timeParts[0]}:${timeParts[1]}`;
 }
 
 function renderMarkdown(md) {
