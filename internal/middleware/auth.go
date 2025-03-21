@@ -24,7 +24,8 @@ func Admin() Middleware {
 				next.ServeHTTP(w, r)
 				return
 			}
-			http.Error(w, "Forbidden", 403)
+			http.Redirect(w, r, "/login", http.StatusFound)
+			//http.Error(w, "Unauthorized", 401)
 		})
 	}
 }

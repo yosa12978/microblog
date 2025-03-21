@@ -117,3 +117,38 @@ footer {
     margin: 10px;
     color: #eb4129;
 }
+
+.inp {
+    width: 100%;
+    margin: auto;
+    padding: 10px;
+    border-width: 2px;
+    box-shadow: none;
+    outline: none;
+    border-style: solid;
+    font-size: 14px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    background-color: #202020;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+#admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#content-input {
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 100px;
+    box-sizing: border-box;
+}
+
+input,
+textarea {
+    box-sizing: border-box;
+}

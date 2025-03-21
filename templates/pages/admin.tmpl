@@ -1,0 +1,46 @@
+{{template "top" .}}
+
+<div id="admin-header">
+<h2>Admin Page</h2>
+<a href="/logout"><button>Logout</button></a>
+</div>
+<hr/>
+
+<form action="/posts" method="POST">
+    <h3>Add new post</h3>
+    <label for="content">Content</label><br>
+    <textarea name="content" id="content-input"></textarea><br>
+    <button type="submit">Submit</button>
+</form>
+
+
+<hr/>
+
+<form action="/posts" method="POST">
+    <h3>Pin post</h3>
+    <label for="id">id</label>
+    <input name="id"></input>
+    <button type="submit">Submit</button>
+</form>
+
+<hr/>
+
+<form action="/posts" method="delete">
+    <h3>Remove post</h3>
+    <label for="id">id</label>
+    <input name="id"></input>
+    <button type="submit">Submit</button>
+</form>
+
+<hr/>
+
+<form action="/posts" method="POST">
+    <h3>Update post</h3>
+    <label for="id">id</label><br>
+    <input name="id"></input><br>
+    <label for="content">Content</label><br>
+    <textarea name="content" id="content-input"></textarea><br>
+    <button type="submit">Submit</button>
+</form>
+
+{{template "bottom" .}}

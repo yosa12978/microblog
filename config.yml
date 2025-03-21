@@ -2,7 +2,7 @@ app:
   name: Yusuf's blog
   description: Just a simple blog
   bottom: Yusuf's microblog. All content is unlicensed.
-  admin_password: $2a$14$pAk/G7qYWHQpBSAwNWiUHOc1DirDxeXf53BYqvh6hMQGztgM.AeWm
+  admin_password: $2a$14$eLn3xCv.4sZWZoxhHaEJbeRcwjHMpQQh1GKOmntybuYWc7C4Dq66e
 server:
   addr: 0.0.0.0:80
   hostname: localhost:5000
