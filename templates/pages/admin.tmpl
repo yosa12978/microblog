@@ -6,8 +6,20 @@
 </div>
 <hr/>
 
-<form action="/posts" method="POST">
+<form action="/admin/create-post" method="POST">
     <h3>Add new post</h3>
+    {{if .Content.CreateErrorMessage}}
+        <div class="error-message">
+            {{.Content.CreateErrorMessage}}
+        </div>
+    {{end}}
+    {{if .Content.CreateSuccessMessage}}
+        <div class="success-message">
+            {{.Content.CreateSuccessMessage}}
+        </div>
+    {{end}}
+    <label for="pin">Pin</label>
+    <input name="pin" type="checkbox"></input><br>
     <label for="content">Content</label><br>
     <textarea name="content" id="content-input"></textarea><br>
     <button type="submit">Submit</button>
@@ -16,8 +28,18 @@
 
 <hr/>
 
-<form action="/posts" method="POST">
+<form action="/admin/pin-post" method="POST">
     <h3>Pin post</h3>
+    {{if .Content.PinErrorMessage}}
+        <div class="error-message">
+            {{.Content.PinErrorMessage}}
+        </div>
+    {{end}}
+    {{if .Content.PinSuccessMessage}}
+        <div class="success-message">
+            {{.Content.PinSuccessMessage}}
+        </div>
+    {{end}}
     <label for="id">id</label>
     <input name="id"></input>
     <button type="submit">Submit</button>
@@ -25,8 +47,18 @@
 
 <hr/>
 
-<form action="/posts" method="delete">
+<form action="/admin/delete-post" method="POST">
     <h3>Remove post</h3>
+    {{if .Content.DeleteErrorMessage}}
+        <div class="error-message">
+            {{.Content.DeleteErrorMessage}}
+        </div>
+    {{end}}
+    {{if .Content.DeleteSuccessMessage}}
+        <div class="success-message">
+            {{.Content.DeleteSuccessMessage}}
+        </div>
+    {{end}}
     <label for="id">id</label>
     <input name="id"></input>
     <button type="submit">Submit</button>
@@ -34,10 +66,22 @@
 
 <hr/>
 
-<form action="/posts" method="POST">
+<form action="/admin/update-post" method="POST">
     <h3>Update post</h3>
-    <label for="id">id</label><br>
+    {{if .Content.UpdateErrorMessage}}
+        <div class="error-message">
+            {{.Content.UpdateErrorMessage}}
+        </div>
+    {{end}}
+    {{if .Content.UpdateSuccessMessage}}
+        <div class="success-message">
+            {{.Content.UpdateSuccessMessage}}
+        </div>
+    {{end}}
+    <label for="id">id</label>
     <input name="id"></input><br>
+    <label for="pin">Pin</label>
+    <input name="pin" type="checkbox"></input><br>
     <label for="content">Content</label><br>
     <textarea name="content" id="content-input"></textarea><br>
     <button type="submit">Submit</button>

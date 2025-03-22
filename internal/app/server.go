@@ -12,7 +12,7 @@ import (
 )
 
 func newServer(addr string, logger *slog.Logger, assets fs.FS, config config.Config) http.Server {
-	postRepo := repos.NewPostRepoSQL(data.Postgres(), logger)
+	postRepo := repos.NewPostRepoPGX(data.Postgres(), logger)
 	postService := services.NewPostService(postRepo, logger)
 	router := router.New(
 		&router.RouterOptions{

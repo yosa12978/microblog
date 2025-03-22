@@ -52,6 +52,10 @@ header #feed-icon {
     max-height: 30px;
 }
 
+main {
+    margin-bottom: 10px;
+}
+
 footer {
     margin-top: auto;
     border-top: 0px solid;
@@ -113,9 +117,14 @@ footer {
     margin: 10px;
 }
 
-#error-message {
+.error-message {
     margin: 10px;
     color: #eb4129;
+}
+
+.success-message {
+    margin: 10px;
+    color: #11ff55;
 }
 
 .inp {

@@ -26,10 +26,22 @@ func NewPostResponse(domain post.Post) PostResponse {
 
 type PostCreateRequest struct {
 	Content string `json:"content"`
+	Pinned  bool   `json:"pinned"`
 }
 
 func (req PostCreateRequest) Domain() (post.Post, error) {
-	return post.NewFromPrimitives(0, req.Content)
+	p, err := post.NewFromPrimitives(0, req.Content)
+	if err != nil {
+		return post.Post{}, err
+	}
+	newPinned, err := post.NewPinned(req.Pinned)
+	if err != nil {
+		return post.Post{}, err
+	}
+	if err := p.SetPinned(newPinned); err != nil {
+		return post.Post{}, err
+	}
+	return p, nil
 }
 
 type PostUpdateRequest struct {

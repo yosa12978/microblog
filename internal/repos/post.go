@@ -2,20 +2,23 @@ package repos
 
 import (
 	"context"
-	"database/sql"
+	"errors"
 	"log/slog"
 	"math"
 	"microblog-app/internal/post"
 	"microblog-app/pkg"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type postRepoSQL struct {
-	db     *sql.DB
+type postRepoPGX struct {
+	db     *pgxpool.Pool
 	logger *slog.Logger
 }
 
-func NewPostRepoSQL(db *sql.DB, logger *slog.Logger) post.Repo {
-	return &postRepoSQL{
+func NewPostRepoPGX(db *pgxpool.Pool, logger *slog.Logger) post.Repo {
+	return &postRepoPGX{
 		db:     db,
 		logger: logger,
 	}
@@ -38,30 +41,30 @@ const (
         FROM posts WHERE id=$1;
     `
 	createPostSQL = `
-        INSERT INTO posts(id, content, created_at, updated_at)
-        VALUES ($1, $2, $3, $4);
+        INSERT INTO posts(content, created_at, updated_at, pinned)
+        VALUES ($1, $2, $3, $4) RETURNING id;
     `
 	updatePostSQL = `
-        UPDATE posts SET content=$1, updated_at=now()
-        WHERE id=$2;
+        UPDATE posts SET content=$1, pinned=$3, updated_at=now()
+        WHERE id=$2 RETURNING id;
     `
 	deletePostSQL = `
         DELETE FROM posts WHERE id=$1;
     `
 )
 
-func (repo *postRepoSQL) GetAll(
+func (repo *postRepoPGX) GetAll(
 	ctx context.Context,
 	page uint,
 	size uint,
 ) (pkg.Page[post.Post], error) {
 	var count uint
-	err := repo.db.QueryRowContext(ctx, getPostsCountSQL).Scan(&count)
+	err := repo.db.QueryRow(ctx, getPostsCountSQL).Scan(&count)
 	if err != nil {
 		return pkg.Page[post.Post]{}, err
 	}
 	totalPages := uint(math.Ceil(float64(count) / float64(size)))
-	rows, err := repo.db.QueryContext(ctx, getAllPostsSQL, size, (page-1)*size)
+	rows, err := repo.db.Query(ctx, getAllPostsSQL, size, (page-1)*size)
 	if err != nil {
 		return pkg.Page[post.Post]{}, nil
 	}
@@ -92,8 +95,8 @@ func (repo *postRepoSQL) GetAll(
 	return pkg.NewPage(posts, totalPages, page, size), nil
 }
 
-func (repo *postRepoSQL) GetFeed(ctx context.Context) ([]post.Post, error) {
-	rows, err := repo.db.QueryContext(ctx, getPostsFeedSQL)
+func (repo *postRepoPGX) GetFeed(ctx context.Context) ([]post.Post, error) {
+	rows, err := repo.db.Query(ctx, getPostsFeedSQL)
 	if err != nil {
 		return []post.Post{}, nil
 	}
@@ -121,58 +124,70 @@ func (repo *postRepoSQL) GetFeed(ctx context.Context) ([]post.Post, error) {
 	return posts, nil
 }
 
-func (repo *postRepoSQL) GetByID(ctx context.Context, id post.ID) (post.Post, error) {
+func (repo *postRepoPGX) GetByID(ctx context.Context, id post.ID) (post.Post, error) {
 	var postSQL post.PostSQL
 
-	err := repo.db.QueryRowContext(ctx, getPostByIDSQL, id.Value()).
+	err := repo.db.QueryRow(ctx, getPostByIDSQL, id.Value()).
 		Scan(&postSQL.ID, &postSQL.Content, &postSQL.Pinned, &postSQL.CreatedAt, &postSQL.UpdatedAt)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return post.Post{}, errors.New("post not found")
+		}
 		return post.Post{}, err
 	}
 	return postSQL.Domain()
 }
 
-func (repo *postRepoSQL) Create(ctx context.Context, p post.Post) (post.ID, error) {
-	result, err := repo.db.ExecContext(
+func (repo *postRepoPGX) Create(ctx context.Context, p post.Post) (post.ID, error) {
+	var lastInsertedID uint64
+	err := repo.db.QueryRow(
 		ctx,
 		createPostSQL,
-		p.ID().Value(),
 		p.Content().Value(),
 		p.UpdatedAt().Value(),
 		p.CreatedAt().Value(),
-	)
+		p.Pinned().Value(),
+	).Scan(&lastInsertedID)
 	if err != nil {
-		return post.ID(0), err
+		return 0, err
 	}
-	idInt, err := result.LastInsertId()
-	if err != nil {
-		return post.ID(0), err
-	}
-	return post.NewID(uint64(idInt))
+	return post.NewID(lastInsertedID)
 }
 
-func (repo *postRepoSQL) Update(ctx context.Context, p post.Post) (post.ID, error) {
-	result, err := repo.db.ExecContext(
+func (repo *postRepoPGX) Update(ctx context.Context, p post.Post) (post.ID, error) {
+	var lastInsertedID uint64
+	err := repo.db.QueryRow(
 		ctx,
 		updatePostSQL,
 		p.Content().Value(),
 		p.ID().Value(),
-	)
+		p.Pinned().Value(),
+	).Scan(&lastInsertedID)
 	if err != nil {
-		return post.ID(0), err
+		return 0, err
 	}
-	idInt, err := result.LastInsertId()
-	if err != nil {
-		return post.ID(0), err
-	}
-	return post.NewID(uint64(idInt))
+	return post.NewID(lastInsertedID)
 }
 
-func (repo *postRepoSQL) Delete(ctx context.Context, id post.ID) (post.ID, error) {
-	_, err := repo.db.ExecContext(
+func (repo *postRepoPGX) Delete(ctx context.Context, id post.ID) (post.ID, error) {
+	if _, err := repo.GetByID(ctx, id); err != nil {
+		return 0, err
+	}
+	_, err := repo.db.Exec(
 		ctx,
 		deletePostSQL,
 		id.Value(),
 	)
 	return id, err
+}
+
+func (repo *postRepoPGX) Pin(ctx context.Context, id post.ID) (post.ID, error) {
+	post, err := repo.GetByID(ctx, id)
+	if err != nil {
+		return 0, err
+	}
+	if err := post.SetPinned(!post.Pinned()); err != nil {
+		return 0, err
+	}
+	return repo.Update(ctx, post)
 }

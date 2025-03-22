@@ -16,3 +16,14 @@ type PostTemplateDTO struct {
 type LoginTemplateDTO struct {
 	Message string
 }
+
+type AdminTemplateDTO struct {
+	CreateSuccessMessage string
+	CreateErrorMessage   string
+	UpdateSuccessMessage string
+	UpdateErrorMessage   string
+	DeleteSuccessMessage string
+	DeleteErrorMessage   string
+	PinSuccessMessage    string
+	PinErrorMessage      string
+}

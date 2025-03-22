@@ -13,6 +13,7 @@ type PostService interface {
 	GetFeed(ctx context.Context) ([]dto.PostResponse, error)
 	GetByID(ctx context.Context, id uint64) (*dto.PostResponse, error)
 
+	Pin(ctx context.Context, id uint64) error
 	Create(ctx context.Context, req dto.PostCreateRequest) (uint64, error)
 	Update(ctx context.Context, id uint64, req dto.PostUpdateRequest) (uint64, error)
 	Delete(ctx context.Context, id uint64) (uint64, error)
@@ -102,6 +103,16 @@ func (p *postService) Update(
 	if err != nil {
 		return 0, err
 	}
+	req.Apply(&post)
 	respID, err := p.repo.Update(ctx, post)
 	return respID.Value(), err
+}
+
+func (p *postService) Pin(ctx context.Context, id uint64) error {
+	newID, err := post.NewID(id)
+	if err != nil {
+		return err
+	}
+	_, err = p.repo.Pin(ctx, newID)
+	return err
 }
